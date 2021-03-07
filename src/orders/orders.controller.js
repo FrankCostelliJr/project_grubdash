@@ -10,7 +10,9 @@ const nextId = require('../utils/nextId');
 
 // TODO: Implement the /orders handlers needed to make the tests pass
 
+// TODO: Create validation functions
 
+// All required fields must be present/an order must include at least one dish
 const isValid = (req, res, next) => {
   const {
     data: { dishes },
@@ -30,6 +32,7 @@ const isValid = (req, res, next) => {
   next();
 };
 
+// Check for invalid dish quantity cases: undefined, less than or equal to zero, or not a number
 const checkDishes = (req, res, next) => {
   const dishes = res.locals.validOrder.data.dishes;
   dishes.forEach((dish, index) => {
@@ -47,6 +50,7 @@ const checkDishes = (req, res, next) => {
     next();
   };
   
+  // Validate an order id for use in read, update or delete handlers
   const isFound = (req, res, next) => {
     const found = orders.find((order) => order.id === req.params.orderId);
     if (!found)
@@ -58,6 +62,7 @@ const checkDishes = (req, res, next) => {
     next();
   };
   
+  // Create validation for update function, which checks status property for: missing status, empty status, or a status of delivered
   const checkStatus = (req, res, next) => {
     const {
       data: { status },
@@ -76,6 +81,8 @@ const checkDishes = (req, res, next) => {
     next();
   };
   
+  // TODO Create /orders handlers
+
   const list = (req, res, next) => {
     res.json({ data: orders });
   };
