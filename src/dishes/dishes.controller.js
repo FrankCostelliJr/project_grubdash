@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict';
 const path = require('path');
 
@@ -9,10 +10,9 @@ const nextId = require('../utils/nextId');
 
 // TODO: Implement the /dishes handlers needed to make the tests pass
 
-function list(req, res) {
-  res.json({ data: dishes });
-}
+// TODO: Create validation middleware
 
+// Find a dish by id, if no dish is found, return error message
 function dishExists(req, res, next) {
   const dishId = req.params.dishId;
   const foundDish = dishes.find((dish) => dish.id === dishId);
@@ -26,10 +26,7 @@ function dishExists(req, res, next) {
   });
 }
 
-function read(req, res, next) {
-  res.json({ data: res.locals.dish });
-}
-
+// Validate a dish id by checking: request id matches a route for a dish, id is not undefined, id is not empty, and id is not null
 function checkDishId(req, res, next) {
   const dishId = req.params.dishId;
   const id = req.body.data.id;
@@ -42,19 +39,11 @@ function checkDishId(req, res, next) {
   return next();
 }
 
-function update(req, res) {
-  const dishId = req.params.dishId;
-  const foundDish = dishes.find((dish) => dish.id === dishId);
-  const { data: { name, description, price, image_url } = {} } = req.body;
-
-  foundDish.name = name;
-  foundDish.description = description;
-  foundDish.price = price;
-  foundDish.image_url = image_url;
-
-  res.json({ data: foundDish });
-}
-
+// Handle validation for properties of a dish: 
+//    name: has name property, cannot be empty string
+//    description: has desc property, cannot be empty string
+//    price: has price property, price > 0, price is integer
+//    img_url: has img_url property, cannot be empty string     
 function isValidDish(req, res, next) {
   const {
     data: { name, description, price, image_url },
@@ -108,9 +97,19 @@ function isValidDish(req, res, next) {
   return next();
 }
 
+//TODO: Create /dishes handlers
+
+function list(req, res) {
+  res.json({ data: dishes });
+}
+
+function read(req, res, next) {
+  res.json({ data: res.locals.dish });
+}
+
 function create(req, res) {
   let { data: { name, description, price, image_url } = {} } = req.body;
-
+  
   const newDish = {
     id: nextId(),
     name: name,
@@ -121,6 +120,20 @@ function create(req, res) {
   dishes.push(newDish);
   res.status(201).json({ data: newDish });
 }
+
+function update(req, res) {
+  const dishId = req.params.dishId;
+  const foundDish = dishes.find((dish) => dish.id === dishId);
+  const { data: { name, description, price, image_url } = {} } = req.body;
+  
+  foundDish.name = name;
+  foundDish.description = description;
+  foundDish.price = price;
+  foundDish.image_url = image_url;
+  
+  res.json({ data: foundDish });
+}
+
 
 module.exports = {
   create: [isValidDish, create],
